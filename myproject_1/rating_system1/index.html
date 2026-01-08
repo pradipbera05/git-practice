@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rating Systems Explained</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <h1><i class="fa-solid fa-chart-line"></i> Rating Systems Explained</h1>
+        <p class="subtitle">An interactive playground to understand how different algorithms rank items, players, and content.</p>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab-btn active" data-tab="simple">
+            <i class="fa-solid fa-star"></i> Simple Average
+        </button>
+        <button class="tab-btn" data-tab="bayesian">
+            <i class="fa-solid fa-scale-balanced"></i> Bayesian Approx
+        </button>
+        <button class="tab-btn" data-tab="elo">
+            <i class="fa-solid fa-chess-knight"></i> Elo Rating
+        </button>
+        <button class="tab-btn" data-tab="decay">
+            <i class="fa-solid fa-clock"></i> Time Decay
+        </button>
+        <button class="tab-btn" data-tab="compare">
+            <i class="fa-solid fa-flask"></i> System Comparison
+        </button>
+    </nav>
+
+    <main class="main-content">
+        
+        <div id="simple" class="tab-content active">
+            <div class="tab-header">
+                <h2>Simple Average Rating</h2>
+                <p class="description">The most common method: Sum of all ratings divided by the count. Vulnerable to low sample sizes.</p>
+            </div>
+
+            <div class="demo-container">
+                <div class="control-panel">
+                    <div class="product-card">
+                        <h3>Demo Product</h3>
+                        <div class="rating-display">
+                            <div class="stars-large" id="simple-stars-display">
+                                <span>0.0</span> <div class="stars-container"></div>
+                            </div>
+                            <p class="rating-count" id="simple-count">0 ratings</p>
+                        </div>
+                        <div class="rating-distribution" id="simple-distribution">
+                            </div>
+                    </div>
+
+                    <div class="controls">
+                        <h3>Add User Rating</h3>
+                        <div class="rating-input">
+                            <div class="star-selector" id="star-input">
+                                <div class="stars">
+                                    <i class="fa-solid fa-star" data-val="1"></i>
+                                    <i class="fa-solid fa-star" data-val="2"></i>
+                                    <i class="fa-solid fa-star" data-val="3"></i>
+                                    <i class="fa-solid fa-star" data-val="4"></i>
+                                    <i class="fa-solid fa-star" data-val="5"></i>
+                                </div>
+                                <span id="selected-rating">Select stars</span>
+                            </div>
+                            <button class="btn-primary" id="btn-add-rating">Submit Rating</button>
+                            <button class="btn-reset" id="btn-reset-simple">Reset Data</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-panel">
+                    <h3><i class="fa-brands fa-python"></i> The Logic</h3>
+                    <div class="info-box">
+                        <p><strong>Problem:</strong> A product with one 5-star rating looks "better" than a product with one hundred 4.8-star ratings.</p>
+                    </div>
+                    <pre class="python-code">
+def calculate_average(ratings):
+    if not ratings:
+        return 0
+    
+    total = sum(ratings)
+    count = len(ratings)
+    
+    return total / count
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <div id="bayesian" class="tab-content">
+            <div class="tab-header">
+                <h2>Bayesian Approximation</h2>
+                <p class="description">Adds "confidence" to the rating by assuming a prior average (dummy votes). Great for sorting new items.</p>
+            </div>
+
+            <div class="comparison-table">
+                <h3>Scenario: Two Items</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Real Ratings</th>
+                            <th>Simple Avg</th>
+                            <th>Bayesian Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bayesian-tbody">
+                        </tbody>
+                </table>
+                <div class="table-footer">
+                    <div class="slider-control">
+                        <label>Confidence (C) - "Dummy Votes": <span id="c-val">10</span></label>
+                        <input type="range" id="slider-c" min="0" max="50" value="10">
+                        <p class="slider-help">How much evidence do we need to sway from the average?</p>
+                    </div>
+                    <div class="slider-control">
+                        <label>Prior Mean (m) - "System Average": <span id="m-val">3.5</span></label>
+                        <input type="range" id="slider-m" min="1" max="5" step="0.1" value="3.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="formula-display">
+                <h4>The Formula</h4>
+                <div class="formula">
+                    Score = 
+                    <div class="fraction">
+                        <span class="numerator">(C × m) + Σ(ratings)</span>
+                        <span class="denominator">C + n</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="elo" class="tab-content">
+            <div class="tab-header">
+                <h2>Elo Rating System</h2>
+                <p class="description">Zero-sum game calculation. Used for Chess, video games, and matchmaking.</p>
+            </div>
+
+            <div class="player-ratings">
+                <div class="players-grid" id="elo-players">
+                    </div>
+            </div>
+
+            <div class="demo-container">
+                <div class="match-controls">
+                    <h3>Simulate Match</h3>
+                    <div class="matchup-selector">
+                        <div class="player-select">
+                            <label>Player A</label>
+                            <select id="player-a-select"></select>
+                            <div class="rating-preview" id="rating-preview-a">1200</div>
+                        </div>
+                        <div class="vs-circle">VS</div>
+                        <div class="player-select">
+                            <label>Player B</label>
+                            <select id="player-b-select"></select>
+                            <div class="rating-preview" id="rating-preview-b">1200</div>
+                        </div>
+                    </div>
+
+                    <div class="expected-outcome">
+                        <h4>Win Probability</h4>
+                        <div class="probabilities">
+                            <div class="prob-bar">
+                                <span class="prob-label">Player A</span>
+                                <div class="prob-visual"><div class="prob-fill" id="prob-bar-a" style="width: 50%"></div></div>
+                                <span class="prob-value" id="prob-text-a">50%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="outcome-selector">
+                        <label>Match Result</label>
+                        <div class="outcome-buttons">
+                            <button class="outcome-btn" data-outcome="A">A Wins</button>
+                            <button class="outcome-btn" data-outcome="draw">Draw</button>
+                            <button class="outcome-btn" data-outcome="B">B Wins</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="match-history">
+                    <h3>Recent Matches</h3>
+                    <div class="history-container" id="match-history-list">
+                        <p style="color:#aaa; text-align:center; padding:20px;">No matches played yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="decay" class="tab-content">
+            <div class="tab-header">
+                <h2>Time-Decay Rating</h2>
+                <p class="description">Ratings become less relevant as time passes. Essential for "Trending" feeds.</p>
+            </div>
+
+            <div class="demo-container">
+                <div class="control-panel">
+                    <div class="driver-profile">
+                        <div class="driver-header">
+                            <div class="driver-avatar"><i class="fa-solid fa-car-side"></i></div>
+                            <div class="driver-info">
+                                <h4>Uber Driver Score</h4>
+                                <div class="current-rating">
+                                    <span class="rating-label">Current Weight:</span>
+                                    <span class="rating-value" id="decay-score">5.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Initial Rating Event:</label>
+                            <div class="stars-small">
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                        </div>
+
+                        <div class="time-slider-container">
+                            <label>Time Since Rating (Days): <span id="days-val">0</span></label>
+                            <input type="range" id="time-slider" min="0" max="30" value="0">
+                            <div class="time-marks">
+                                <span>Today</span>
+                                <span>1 Month Ago</span>
+                            </div>
+                        </div>
+
+                        <div class="weight-info">
+                            <h4>Formula: Exponential Decay</h4>
+                            <p>Score = Initial Rating × e<sup>(-λ × time)</sup></p>
+                            <p>Where λ (decay rate) = 0.1</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-panel">
+                    <h3><i class="fa-solid fa-code"></i> Implementation</h3>
+                    <pre class="python-code">
+import math
+
+def calculate_decay(rating, days_ago):
+    # Decay rate (lambda)
+    decay_rate = 0.1 
+    
+    # Calculate weight factor
+    weight = math.exp(-decay_rate * days_ago)
+    
+    return rating * weight
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <div id="compare" class="tab-content">
+            <div class="tab-header">
+                <h2>Comparison Logic</h2>
+                <p class="description">Run a simulation to see how different algorithms treat the exact same dataset.</p>
+            </div>
+
+            <div class="test-scenario">
+                <h3>Test Scenario: "The Controversial Movie"</h3>
+                <p>A movie has a mix of 5-star fan ratings and 1-star hater ratings.</p>
+                
+                <div class="ratings-set">
+                    <span class="rating-bubble"><i class="fa-solid fa-star"></i> 5 (x10)</span>
+                    <span class="rating-bubble"><i class="fa-solid fa-star"></i> 1 (x5)</span>
+                    <span class="rating-bubble"><i class="fa-solid fa-star"></i> 3 (x2)</span>
+                </div>
+
+                <div class="scenario-controls">
+                    <button class="btn-primary" id="btn-run-simulation">Run Simulation</button>
+                </div>
+            </div>
+
+            <div class="results-grid" id="simulation-results">
+                </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>Designed for learning algorithm logic.</p>
+        <div class="footer-links">
+            <a href="#"><i class="fa-brands fa-github"></i> View Source</a>
+            <a href="#"><i class="fa-solid fa-book"></i> Read Documentation</a>
+        </div>
+    </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
